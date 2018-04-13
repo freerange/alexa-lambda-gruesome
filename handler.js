@@ -54,6 +54,48 @@ const handlers = {
           console.log("Error: " + err.message);
         });
     },
+    'Go': function() {
+      var gameCommand = 'go ' + this.event.request.intent.slots.gameDirection.value;
+
+      var postData = {
+          'command': gameCommand,
+          'memory': this.attributes.gameMemory
+      };
+
+      const options = {
+        protocol: 'https:',
+        hostname: 'fast-bastion-39196.herokuapp.com',
+        port: 443,
+        path: '/',
+        method: 'POST'
+      };
+
+      var self = this;
+      const req = https.request(options, (res) => {
+          let data = '';
+          res.setEncoding('utf8');
+          res.on('data', (chunk) => {
+              data += chunk;
+          });
+          res.on('end', () => {
+              var parsedOutput = JSON.parse(data);
+              self.attributes.gameMemory = parsedOutput.memory;
+
+              var text = parsedOutput.output.replace(/\n/g, '. ').replace(/>$/, '');
+              this.response.speak(text);
+              this.response.shouldEndSession(false);
+              this.emit(':responseReady');
+          });
+      });
+
+      req.on('error', (e) => {
+        console.error(`problem with request: ${e.message}`);
+      });
+
+      // write data to request body
+      req.write(JSON.stringify(postData));
+      req.end();
+    },
     'ExecuteGameCommand': function() {
         var gameCommand = this.event.request.intent.slots.gameCommand.value;
 
