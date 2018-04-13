@@ -15,11 +15,10 @@ provider:
 
 # The `functions` block defines what code to deploy
 functions:
-  helloWorld:
-    handler: handler.helloWorld
+  handler:
+    handler: handler.handler
     # The `events` block defines how to trigger the handler.helloWorld code
     events:
-      - http:
-          path: hello-world
-          method: get
-          cors: true
+      - alexaSkill:
+          appId: amzn1.ask.skill.6dd41db1-270b-4bd1-9c83-bbd83a377acf
+          enabled: true
